@@ -28,6 +28,32 @@ void testPythonScript()
 	PyRun_SimpleFile(file, "script1");
 }
 
+void testPyhonModule()
+{
+	PyRun_SimpleString("import sys");
+	PyRun_SimpleString("sys.path.append('.')");
+	PyCppObject moduleName = PyUnicode_FromString("module1");
+	PyCppObject module = PyImport_Import(moduleName);
+	if (!module)
+	{
+		std::cout << "Error opening module1.py" << std::endl;
+		return;
+	}
+
+	PyCppObject foo = PyObject_GetAttrString(module, "foo");
+	if (!(foo && PyCallable_Check(foo)))
+	{
+		std::cout << "Error loading foo()" << std::endl;
+		return;
+	}
+
+	PyCppObject value = PyObject_CallObject(foo, NULL);
+
+	std::cout << "value obtained from python " <<  PyLong_AsLong(value) << std::endl;
+
+
+}
+
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -37,6 +63,6 @@ int main(int argc, char* argv[])
 	
 	PyCppInstance pyInstance;
 	testPythonScript();
-
+	testPyhonModule();
     return 0;
 }
